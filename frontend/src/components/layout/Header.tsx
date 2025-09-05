@@ -13,7 +13,12 @@ import { LogOut, User, Menu } from 'lucide-react';
 
 import { useNavigate } from 'react-router-dom';
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+  onToggleSidebar?: () => void;
+  sidebarOpen?: boolean;
+}
+
+export const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen }) => {
 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -47,61 +52,101 @@ export const Header: React.FC = () => {
   const toggleDarkMode = () => setDarkMode((d) => !d);
 
   return (
-    <header className="border-b bg-card">
+    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-white/80 backdrop-blur-xl shadow-lg shadow-gray-500/5">
       <div className="flex h-16 items-center justify-between px-6">
-        <div className="flex items-center space-x-4">
-          <h1 className="text-xl font-bold text-primary">Campus Help Desk</h1>
-          {user && (
-            <span className="text-sm text-muted-foreground capitalize">
-              {user.role} Dashboard
-            </span>
+        {/* Logo and Brand */}
+        <div className="flex items-center gap-4">
+          {/* Sidebar Toggle */}
+          {onToggleSidebar && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggleSidebar}
+              className="w-10 h-10 rounded-xl hover:bg-gray-100/80 transition-all duration-300 lg:hidden"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
           )}
+          
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                Campus Help Desk
+              </h1>
+              <p className="text-xs text-gray-500 capitalize">
+                {user?.role || 'Dashboard'}
+              </p>
+            </div>
+          </div>
         </div>
-        {/* Desktop menu */}
-        <div className="hidden md:flex items-center space-x-4">
-          <Button variant="ghost" size="sm" aria-label="Toggle dark mode" onClick={toggleDarkMode}>
+
+        {/* Right Section */}
+        <div className="flex items-center gap-4">
+          {/* Dark Mode Toggle */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleDarkMode}
+            className="w-10 h-10 rounded-xl hover:bg-gray-100/80 transition-all duration-300"
+          >
             {darkMode ? <SunIcon /> : <MoonIcon />}
           </Button>
-          {user && (
-            <>
-              <span className="text-sm font-medium">{user.name}</span>
-              <Avatar className="h-8 w-8">
-                <AvatarFallback>
-                  {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+
+          {/* User Menu */}
+          <div className="relative">
+            <Button
+              variant="ghost"
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="flex items-center gap-3 h-12 px-4 rounded-2xl hover:bg-gray-100/80 transition-all duration-300"
+            >
+              <Avatar className="h-8 w-8 ring-2 ring-blue-500/20">
+                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-sm font-semibold">
+                  {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
-              <Button variant="ghost" size="sm" onClick={handleProfile}>
-                <User className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
-                <LogOut className="h-4 w-4" />
-              </Button>
-            </>
-          )}
-        </div>
-        {/* Hamburger menu for mobile */}
-        <div className="md:hidden flex items-center">
-          <Button variant="ghost" size="icon" aria-label="Open menu" onClick={() => setMenuOpen((v) => !v)}>
-            <Menu className="h-6 w-6" />
-          </Button>
-          {menuOpen && (
-            <div className="absolute top-16 right-4 z-50 w-48 rounded-md shadow-lg bg-card border p-4 flex flex-col space-y-2 animate-in fade-in slide-in-from-top-2">
-              <Button variant="ghost" size="sm" aria-label="Toggle dark mode" onClick={toggleDarkMode} className="justify-start">
-                {darkMode ? <SunIcon /> : <MoonIcon />}<span className="ml-2">{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
-              </Button>
-              {user && <span className="text-sm font-medium px-2">{user.name}</span>}
-              {user && (
-                <>
-                  <Button variant="ghost" size="sm" onClick={handleProfile} className="justify-start">
-                    <User className="h-4 w-4 mr-2" /> Profile
+              <div className="hidden md:block text-left">
+                <p className="text-sm font-semibold text-gray-900">{user?.name || 'User'}</p>
+                <p className="text-xs text-gray-500">{user?.email}</p>
+              </div>
+              <svg className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${menuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </Button>
+
+            {/* Dropdown Menu */}
+            {menuOpen && (
+              <div className="absolute right-0 mt-2 w-64 bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-2xl shadow-2xl shadow-gray-500/10 py-2 z-50">
+                <div className="px-4 py-3 border-b border-gray-100">
+                  <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
+                  <p className="text-xs text-gray-500">{user?.email}</p>
+                  <p className="text-xs text-blue-600 capitalize font-medium mt-1">{user?.role}</p>
+                </div>
+                <div className="py-2">
+                  <Button
+                    variant="ghost"
+                    onClick={handleProfile}
+                    className="w-full justify-start gap-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100/60 rounded-xl mx-2"
+                  >
+                    <User className="h-4 w-4" />
+                    Profile Settings
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={handleLogout} className="justify-start">
-                    <LogOut className="h-4 w-4 mr-2" /> Logout
+                  <Button
+                    variant="ghost"
+                    onClick={handleLogout}
+                    className="w-full justify-start gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50/60 rounded-xl mx-2"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Sign Out
                   </Button>
-                </>
-              )}
-            </div>
-          )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>

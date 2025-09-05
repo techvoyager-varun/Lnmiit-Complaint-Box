@@ -7,11 +7,16 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { Complaint } from '@/types';
 import { apiRequest } from '@/lib/api';
+import { getFilteredComplaintsByStatus, filterVisibleComplaints } from '@/lib/complaintFilters';
+import { useMidnightRefresh } from '@/hooks/useMidnightRefresh';
 
 const MaintenanceDashboard = () => {
   const { user } = useAuth();
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [selectedBuilding, setSelectedBuilding] = useState('BH1');
+
+  // Refresh UI at midnight to hide resolved complaints
+  useMidnightRefresh();
 
   useEffect(() => {
     async function load() {
@@ -24,11 +29,11 @@ const MaintenanceDashboard = () => {
         roomNumber: d.roomNumber || '',
         problemType: d.category,
         description: d.description,
-        status: d.status === 'open' ? 'pending' : d.status === 'in_progress' ? 'assigned' : d.status === 'resolved' ? 'resolved' : 'not-resolved',
+        status: d.status === 'open' ? 'pending' : d.status === 'in_progress' ? 'assigned' : d.status === 'resolved' ? 'resolved' : 'not-resolved' as any,
         createdAt: d.createdAt,
         updatedAt: d.updatedAt,
       }));
-      setComplaints(mapped);
+      setComplaints(filterVisibleComplaints(mapped));
     }
     load();
   }, [user]);
@@ -42,7 +47,7 @@ const MaintenanceDashboard = () => {
   };
 
   const getComplaintsByStatus = (status: string) => {
-    let filtered = complaints.filter(c => c.status === status);
+    let filtered = getFilteredComplaintsByStatus(complaints, status);
     if (user?.role === 'maintenance' && user.profession && professionToProblemType[user.profession]) {
       filtered = filtered.filter(c => c.problemType === professionToProblemType[user.profession]);
     }
@@ -90,11 +95,8 @@ const MaintenanceDashboard = () => {
 
         <Tabs defaultValue="pending" className="w-full">
           <TabsList className="grid w-full grid-cols-1">
-            <TabsTrigger value="pending" className="relative">
+            <TabsTrigger value="pending">
               Pending Complaints
-              <Badge className="ml-2">{
-                getComplaintsByStatus('pending').filter(c => c.building === selectedBuilding).length
-              }</Badge>
             </TabsTrigger>
           </TabsList>
 

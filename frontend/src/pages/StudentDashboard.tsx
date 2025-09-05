@@ -7,11 +7,16 @@ import { useAuth } from '@/contexts/AuthContext';
 import { listMyComplaintsApi, updateComplaintStatusApi } from '@/lib/api';
 import { Complaint } from '@/types';
 import { Plus } from 'lucide-react';
+import { filterVisibleComplaints } from '@/lib/complaintFilters';
+import { useMidnightRefresh } from '@/hooks/useMidnightRefresh';
 
 const StudentDashboard = () => {
   const { user } = useAuth();
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [showNewComplaintForm, setShowNewComplaintForm] = useState(false);
+
+  // Refresh UI at midnight to hide resolved complaints
+  useMidnightRefresh();
 
   useEffect(() => {
     async function load() {
@@ -27,11 +32,11 @@ const StudentDashboard = () => {
           roomNumber: user.roomNumber || '',
           problemType: d.category,
           description: d.description,
-          status: d.status === 'open' ? 'pending' : d.status === 'in_progress' ? 'assigned' : d.status === 'resolved' ? 'resolved' : 'not-resolved',
+          status: d.status === 'open' ? 'pending' : d.status === 'in_progress' ? 'assigned' : d.status === 'resolved' ? 'resolved' : 'not-resolved' as any,
           createdAt: d.createdAt,
           updatedAt: d.updatedAt,
         }));
-        setComplaints(mapped);
+        setComplaints(filterVisibleComplaints(mapped));
       } catch (e) {
         // ignore for now
       }
