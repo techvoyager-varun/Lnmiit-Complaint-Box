@@ -10,7 +10,8 @@ router.get('/me', listMyComplaints);
 router.post('/', createComplaint);
 
 router.get('/', requireRole(['warden', 'maintenance']), listAllComplaints);
-router.patch('/:id', requireRole(['warden', 'maintenance']), updateComplaintStatus);
+// allow any authenticated user to attempt updates; controller will enforce ownership/role
+router.patch('/:id', updateComplaintStatus);
 
 module.exports = router;
 

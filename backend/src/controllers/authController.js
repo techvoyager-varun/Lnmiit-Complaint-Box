@@ -41,9 +41,32 @@ async function signup(req, res) {
     return;
   }
   const passwordHash = await bcrypt.hash(password, 10);
-  const user = await User.create({ name, email, passwordHash, role: role ?? 'student' });
+  const user = await User.create({
+    name,
+    email,
+    passwordHash,
+    role: role ?? 'student',
+    rollNumber: req.body.rollNumber,
+    roomNumber: req.body.roomNumber,
+    building: req.body.building,
+    assignedBuilding: req.body.assignedBuilding,
+    profession: req.body.profession,
+  });
   const token = signToken(user.id, user.role);
-  res.status(201).json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+  res.status(201).json({
+    token,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      building: user.building,
+      assignedBuilding: user.assignedBuilding,
+      rollNumber: user.rollNumber,
+      roomNumber: user.roomNumber,
+      profession: user.profession,
+    }
+  });
 }
 
 async function login(req, res) {
@@ -64,7 +87,20 @@ async function login(req, res) {
     return;
   }
   const token = signToken(user.id, user.role);
-  res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+  res.json({
+    token,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      building: user.building,
+      assignedBuilding: user.assignedBuilding,
+      rollNumber: user.rollNumber,
+      roomNumber: user.roomNumber,
+      profession: user.profession,
+    }
+  });
 }
 
 function signToken(userId, role) {

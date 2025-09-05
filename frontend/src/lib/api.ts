@@ -24,7 +24,16 @@ export async function loginApi(email: string, password: string): Promise<{ token
   });
 }
 
-export async function signupApi(payload: { name: string; email: string; password: string; role: 'student' | 'warden' | 'maintenance' }): Promise<{ token: string; user: any }> {
+export async function signupApi(payload: {
+  name: string;
+  email: string;
+  password: string;
+  role: 'student' | 'warden' | 'maintenance';
+  building?: string;
+  roomNumber?: string;
+  assignedBuilding?: string;
+  profession?: string;
+}): Promise<{ token: string; user: any }> {
   return apiRequest('/auth/signup', {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -40,6 +49,13 @@ export async function createComplaintApi(payload: { title: string; description: 
 
 export async function listMyComplaintsApi(): Promise<any[]> {
   return apiRequest('/complaints/me', { method: 'GET' });
+}
+
+export async function updateComplaintStatusApi(id: string, payload: { status?: string; assignedTo?: string }): Promise<any> {
+  return apiRequest(`/complaints/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
 }
 
 

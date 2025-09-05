@@ -4,7 +4,7 @@ import { Header } from '@/components/layout/Header';
 import { ComplaintCard } from '@/components/complaints/ComplaintCard';
 import { NewComplaintForm } from '@/components/complaints/NewComplaintForm';
 import { useAuth } from '@/contexts/AuthContext';
-import { listMyComplaintsApi } from '@/lib/api';
+import { listMyComplaintsApi, updateComplaintStatusApi } from '@/lib/api';
 import { Complaint } from '@/types';
 import { Plus } from 'lucide-react';
 
@@ -39,9 +39,29 @@ const StudentDashboard = () => {
     load();
   }, [user]);
 
-  const handleNewComplaint = (complaint: Complaint) => {
-    setComplaints([complaint, ...complaints]);
+  const handleNewComplaint = (complaint: any) => {
+    const mapped: Complaint = {
+      id: complaint._id,
+      studentId: complaint.student,
+      studentName: user?.name || '',
+      building: user?.building || 'BH1',
+      roomNumber: user?.roomNumber || '',
+      problemType: complaint.category,
+      description: complaint.description,
+      status: complaint.status === 'open' ? 'pending' : complaint.status === 'in_progress' ? 'assigned' : complaint.status === 'resolved' ? 'resolved' : 'not-resolved',
+      createdAt: complaint.createdAt,
+      updatedAt: complaint.updatedAt,
+    };
+    setComplaints([mapped, ...complaints]);
     setShowNewComplaintForm(false);
+  };
+
+  const handleUpdate = async (complaint: Complaint, newStatus: 'resolved' | 'not-resolved') => {
+    const backendStatus = newStatus === 'resolved' ? 'resolved' : 'rejected';
+    await updateComplaintStatusApi(complaint.id, { status: backendStatus });
+    setComplaints((prev) =>
+      prev.map((c) => (c.id === complaint.id ? { ...c, status: newStatus } : c))
+    );
   };
 
   if (showNewComplaintForm) {
@@ -91,6 +111,11 @@ const StudentDashboard = () => {
                 key={complaint.id}
                 complaint={complaint}
                 userRole="student"
+                showActions
+                onUpdate={(c) => {
+                  const next = c.status === 'resolved' ? 'resolved' : 'not-resolved';
+                  handleUpdate(complaint, next as any);
+                }}
               />
             ))}
           </div>

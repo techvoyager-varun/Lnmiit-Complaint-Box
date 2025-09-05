@@ -19,6 +19,8 @@ async function createComplaint(req, res) {
     description,
     category,
     student: req.authUser.userId,
+    building: req.body.building,
+    roomNumber: req.body.roomNumber,
   });
   res.status(201).json(doc);
 }
@@ -36,15 +38,37 @@ async function listAllComplaints(_req, res) {
 async function updateComplaintStatus(req, res) {
   const { status, assignedTo } = req.body || {};
   const { id } = req.params;
-  const doc = await Complaint.findByIdAndUpdate(
-    id,
-    { $set: { status, assignedTo } },
-    { new: true }
-  );
+  const doc = await Complaint.findById(id);
   if (!doc) {
     res.status(404).json({ message: 'Complaint not found' });
     return;
   }
+
+  // permissions:
+  // - student can only update own complaint to resolved or rejected (not-resolved)
+  // - warden/maintenance can assign and set status in_progress/resolved/rejected
+  const role = req.authUser.role;
+  const isOwner = String(doc.student) === String(req.authUser.userId);
+
+  if (role === 'student') {
+    if (!isOwner) {
+      res.status(403).json({ message: 'Forbidden' });
+      return;
+    }
+    if (!['resolved', 'rejected'].includes(status)) {
+      res.status(400).json({ message: 'Invalid status for student' });
+      return;
+    }
+    doc.status = status;
+  } else if (role === 'warden' || role === 'maintenance') {
+    if (assignedTo) doc.assignedTo = assignedTo;
+    if (status) doc.status = status;
+  } else {
+    res.status(403).json({ message: 'Forbidden' });
+    return;
+  }
+
+  await doc.save();
   res.json(doc);
 }
 

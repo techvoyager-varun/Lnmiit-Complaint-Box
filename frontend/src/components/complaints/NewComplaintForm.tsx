@@ -29,13 +29,16 @@ export const NewComplaintForm: React.FC<NewComplaintFormProps> = ({ onSubmit, on
     e.preventDefault();
     setLoading(true);
     try {
-      await createComplaintApi({
+      const created = await createComplaintApi({
         title: formData.problemType,
         description: formData.description,
         category: formData.problemType,
-      });
+        // send building/room to backend so wardens can filter accurately
+        ...(user?.building ? { building: user.building } : {}),
+        ...(user?.roomNumber ? { roomNumber: user.roomNumber } : {}),
+      } as any);
       toast({ title: 'Complaint Submitted', description: 'Your complaint has been submitted successfully.' });
-      onSubmit({});
+      onSubmit(created);
     } catch (err: any) {
       toast({ title: 'Submission Failed', description: err.message || 'Try again', variant: 'destructive' });
     } finally {

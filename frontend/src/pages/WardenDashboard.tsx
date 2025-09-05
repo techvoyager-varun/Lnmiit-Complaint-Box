@@ -5,23 +5,36 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
-import { mockComplaints } from '@/data/mockData';
 import { Complaint, Building } from '@/types';
+import { apiRequest } from '@/lib/api';
 
 const WardenDashboard = () => {
   const { user } = useAuth();
   const [selectedBuilding, setSelectedBuilding] = useState<Building>(user?.assignedBuilding || 'BH1');
   const [complaints, setComplaints] = useState<Complaint[]>([]);
 
-  const buildings: Building[] = ['BH1', 'BH2', 'BH3', 'BH4', 'GH'];
+  const buildings: Building[] = user?.assignedBuilding ? [user.assignedBuilding as Building] : ['BH1', 'BH2', 'BH3', 'BH4', 'GH'];
 
   useEffect(() => {
-    // Filter complaints for selected building and exclude resolved ones for main view
-    const buildingComplaints = mockComplaints.filter(c => 
-      c.building === selectedBuilding && c.status !== 'resolved'
-    );
-    setComplaints(buildingComplaints);
-  }, [selectedBuilding]);
+    async function load() {
+      const data = await apiRequest<any[]>('/complaints');
+      const filtered = user?.assignedBuilding ? data.filter((d) => d.building === user.assignedBuilding) : data;
+      const mapped: Complaint[] = filtered.map((d: any) => ({
+        id: d._id,
+        studentId: d.student,
+        studentName: d.studentName || 'Student',
+        building: d.building,
+        roomNumber: d.roomNumber || '',
+        problemType: d.category,
+        description: d.description,
+        status: d.status === 'open' ? 'pending' : d.status === 'in_progress' ? 'assigned' : d.status === 'resolved' ? 'resolved' : 'not-resolved',
+        createdAt: d.createdAt,
+        updatedAt: d.updatedAt,
+      }));
+      setComplaints(mapped.filter(c => c.building === selectedBuilding));
+    }
+    load();
+  }, [selectedBuilding, user?.assignedBuilding]);
 
   const getComplaintsByStatus = (status: string) => {
     return complaints.filter(c => c.status === status);
@@ -66,9 +79,9 @@ const WardenDashboard = () => {
               Pending
               <Badge className="ml-2">{getComplaintsByStatus('pending').length}</Badge>
             </TabsTrigger>
-            <TabsTrigger value="assigned" className="relative">
-              Assigned
-              <Badge className="ml-2">{getComplaintsByStatus('assigned').length}</Badge>
+            <TabsTrigger value="resolved" className="relative">
+              Resolved
+              <Badge className="ml-2">{getComplaintsByStatus('resolved').length}</Badge>
             </TabsTrigger>
             <TabsTrigger value="not-resolved" className="relative">
               Not Resolved
@@ -95,19 +108,21 @@ const WardenDashboard = () => {
             )}
           </TabsContent>
 
-          <TabsContent value="assigned" className="mt-6">
+          <TabsContent value="resolved" className="mt-6">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {getComplaintsByStatus('assigned').map((complaint) => (
+              {getComplaintsByStatus('resolved').map((complaint) => (
                 <ComplaintCard
                   key={complaint.id}
                   complaint={complaint}
+                  onUpdate={handleComplaintUpdate}
+                  showActions={true}
                   userRole="warden"
                 />
               ))}
             </div>
-            {getComplaintsByStatus('assigned').length === 0 && (
+            {getComplaintsByStatus('resolved').length === 0 && (
               <div className="text-center py-12">
-                <p className="text-muted-foreground">No assigned complaints in {selectedBuilding}</p>
+                <p className="text-muted-foreground">No resolved complaints in {selectedBuilding}</p>
               </div>
             )}
           </TabsContent>

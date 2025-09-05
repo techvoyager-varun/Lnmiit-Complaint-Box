@@ -88,9 +88,27 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
         {showActions && userRole && (
           <div className="flex space-x-2 pt-2">
             {userRole === 'warden' && complaint.status === 'pending' && (
-              <Button size="sm" onClick={() => onUpdate?.(complaint)}>
+              <Button size="sm" onClick={() => onUpdate?.({ ...complaint, status: 'assigned' })}>
                 Assign
               </Button>
+            )}
+
+            {userRole === 'warden' && complaint.status === 'assigned' && (
+              <>
+                <Button
+                  size="sm"
+                  onClick={() => onUpdate?.({ ...complaint, status: 'resolved' })}
+                >
+                  Mark Resolved
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => onUpdate?.({ ...complaint, status: 'not-resolved' })}
+                >
+                  Not Resolved
+                </Button>
+              </>
             )}
             
             {userRole === 'maintenance' && complaint.status === 'assigned' && (
@@ -107,6 +125,24 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
                   onClick={() => onUpdate?.({ ...complaint, status: 'not-resolved' })}
                 >
                   Cannot Resolve
+                </Button>
+              </>
+            )}
+
+            {userRole === 'student' && (complaint.status === 'pending' || complaint.status === 'assigned') && (
+              <>
+                <Button
+                  size="sm"
+                  onClick={() => onUpdate?.({ ...complaint, status: 'resolved' })}
+                >
+                  ✓ Resolved
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => onUpdate?.({ ...complaint, status: 'not-resolved' })}
+                >
+                  ✗ Not Resolved
                 </Button>
               </>
             )}

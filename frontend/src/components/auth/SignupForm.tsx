@@ -13,6 +13,7 @@ export const SignupForm: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    password: '',
     role: '' as UserRole,
     rollNumber: '',
     roomNumber: '',
@@ -33,8 +34,12 @@ export const SignupForm: React.FC = () => {
       const { token, user } = await signupApi({
         name: formData.name,
         email: formData.email,
-        password: 'password',
+        password: formData.password,
         role: formData.role,
+        building: formData.role === 'student' ? formData.building : undefined,
+        roomNumber: formData.role === 'student' ? formData.roomNumber : undefined,
+        assignedBuilding: formData.role === 'warden' ? formData.assignedBuilding : undefined,
+        profession: formData.role === 'maintenance' ? formData.profession : undefined,
       });
       login({ user, token });
       toast({ title: 'Account Created', description: 'Your account has been created successfully!' });
@@ -79,6 +84,18 @@ export const SignupForm: React.FC = () => {
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           placeholder="Enter your email"
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="password">Password</Label>
+        <Input
+          id="password"
+          type="password"
+          value={formData.password}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          placeholder="Create a password"
           required
         />
       </div>
