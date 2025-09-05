@@ -10,6 +10,8 @@ import Signup from "./pages/Signup";
 import StudentDashboard from "./pages/StudentDashboard";
 import WardenDashboard from "./pages/WardenDashboard";
 import MaintenanceDashboard from "./pages/MaintenanceDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminLogin from "./pages/AdminLogin";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
@@ -36,9 +38,8 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Index />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
-      
-      <Route path="/dashboard" element={
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/admin-login" element={<AdminLogin />} />      <Route path="/dashboard" element={
         <ProtectedRoute allowedRoles={['student', 'warden', 'maintenance']}>
           <DashboardRedirect />
         </ProtectedRoute>
@@ -56,13 +57,16 @@ const AppRoutes = () => {
         </ProtectedRoute>
       } />
       
-      <Route path="/maintenance" element={
-        <ProtectedRoute allowedRoles={['maintenance']}>
-          <MaintenanceDashboard />
-        </ProtectedRoute>
-      } />
-      
-      <Route path="/profile" element={
+          <Route path="/maintenance" element={
+            <ProtectedRoute allowedRoles={['maintenance']}>
+              <MaintenanceDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />      <Route path="/profile" element={
         <ProtectedRoute allowedRoles={['student', 'warden', 'maintenance']}>
           <Profile />
         </ProtectedRoute>

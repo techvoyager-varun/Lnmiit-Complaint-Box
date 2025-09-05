@@ -1,4 +1,4 @@
-export type UserRole = 'student' | 'warden' | 'maintenance';
+export type UserRole = 'student' | 'warden' | 'maintenance' | 'admin';
 
 export type Building = 'BH1' | 'BH2' | 'BH3' | 'BH4' | 'GH';
 

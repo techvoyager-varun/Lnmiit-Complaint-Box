@@ -83,9 +83,12 @@ export const SignupForm: React.FC = () => {
           type="email"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          placeholder="Enter your email"
+          placeholder="example: 20ucs000@lnmiit.ac.in"
           required
         />
+        <p className="text-sm text-muted-foreground">
+          Students must use their LNMIIT email (e.g., 20ucs000@lnmiit.ac.in)
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -108,10 +111,11 @@ export const SignupForm: React.FC = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="student">Student</SelectItem>
-            <SelectItem value="warden">Warden</SelectItem>
-            <SelectItem value="maintenance">Maintenance Staff</SelectItem>
           </SelectContent>
         </Select>
+        <p className="text-sm text-muted-foreground">
+          Note: Warden and Maintenance staff accounts can only be created by the admin.
+        </p>
       </div>
 
       {/* Student specific fields */}

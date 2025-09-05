@@ -15,12 +15,21 @@ const Index = () => {
           <p className="text-xl text-muted-foreground mb-8">
             Streamlined complaint management for college hostels and buildings
           </p>
-          <div className="flex justify-center space-x-4">
-            <Button size="lg" onClick={() => navigate('/login')}>
-              Sign In
-            </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/signup')}>
-              Create Account
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex justify-center space-x-4">
+              <Button size="lg" onClick={() => navigate('/login')}>
+                Sign In
+              </Button>
+              <Button size="lg" variant="outline" onClick={() => navigate('/signup')}>
+                Create Account
+              </Button>
+            </div>
+            <Button 
+              variant="ghost" 
+              className="text-muted-foreground hover:text-primary"
+              onClick={() => navigate('/admin-login')}
+            >
+              Admin Login →
             </Button>
           </div>
         </div>

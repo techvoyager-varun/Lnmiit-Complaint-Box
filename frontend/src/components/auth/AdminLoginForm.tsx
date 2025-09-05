@@ -4,11 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
-import { loginApi } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 
-export const LoginForm: React.FC = () => {
-  const [email, setEmail] = useState('');
+export const AdminLoginForm: React.FC = () => {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -20,11 +19,7 @@ export const LoginForm: React.FC = () => {
     setLoading(true);
 
     try {
-      const { token, user } = await loginApi(email, password);
-      login({ user, token });
-      toast({ title: 'Login Successful', description: `Welcome back, ${user.name}!` });
-      // Special check for super admin
-      if (email === 'LNMIIT' && password === '123456') {
+      if (username === 'LNMIIT' && password === '123456') {
         login({
           user: {
             id: 'admin',
@@ -34,28 +29,17 @@ export const LoginForm: React.FC = () => {
           },
           token: 'admin-token'
         });
+        toast({ title: 'Login Successful', description: 'Welcome, Super Admin!' });
         navigate('/admin');
-        return;
-      }
-
-      switch (user.role as any) {
-        case 'student':
-          navigate('/student');
-          break;
-        case 'warden':
-          navigate('/warden');
-          break;
-        case 'maintenance':
-          navigate('/maintenance');
-          break;
-        case 'admin':
-          navigate('/admin');
-          break;
-        default:
-          navigate('/');
+      } else {
+        throw new Error('Invalid admin credentials');
       }
     } catch (err: any) {
-      toast({ title: 'Login Failed', description: err.message || 'Invalid credentials', variant: 'destructive' });
+      toast({ 
+        title: 'Login Failed', 
+        description: 'Invalid admin credentials',
+        variant: 'destructive' 
+      });
     }
 
     setLoading(false);
@@ -64,13 +48,12 @@ export const LoginForm: React.FC = () => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="username">Username</Label>
         <Input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter your email"
+          id="username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Enter admin username"
           required
         />
       </div>
@@ -82,24 +65,14 @@ export const LoginForm: React.FC = () => {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter your password"
+          placeholder="Enter admin password"
           required
         />
       </div>
 
       <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? 'Signing in...' : 'Sign In'}
+        {loading ? 'Logging in...' : 'Login as Admin'}
       </Button>
-
-      <div className="text-center">
-        <Button
-          type="button"
-          variant="link"
-          onClick={() => navigate('/signup')}
-        >
-          Don't have an account? Sign Up
-        </Button>
-      </div>
     </form>
   );
 };
