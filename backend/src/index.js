@@ -17,6 +17,11 @@ app.use(
 );
 app.use(express.json());
 
+
+app.get('/', (_req, res) => {
+  res.send('LNMIIT Complaint Box API is running!');
+});
+
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
