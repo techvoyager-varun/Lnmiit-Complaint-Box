@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,9 +10,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { User, Mail, Building, Hash, DoorOpen, Wrench } from 'lucide-react';
 
+
 const Profile = () => {
   const { user, login } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
@@ -37,8 +40,12 @@ const Profile = () => {
       <Header />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
+          <div className="mb-4">
+            <Button variant="outline" onClick={() => navigate(-1)}>
+              &#8592; Back
+            </Button>
+          </div>
           <h1 className="text-3xl font-bold mb-8">Profile</h1>
-          
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">

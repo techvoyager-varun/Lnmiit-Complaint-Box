@@ -13,6 +13,16 @@ async function createComplaint(req, res) {
     res.status(400).json({ message: 'Invalid input', errors: parsed.error.flatten() });
     return;
   }
+  // Check complaint limit: max 2 per 24 hours
+  const now = new Date();
+  const since = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const recentCount = await Complaint.countDocuments({
+    student: req.authUser.userId,
+    createdAt: { $gte: since }
+  });
+  if (recentCount >= 2) {
+    return res.status(429).json({ message: 'You can only submit 2 complaints per 24 hours. Please try again later.' });
+  }
   const { title, description, category } = parsed.data;
   const doc = await Complaint.create({
     title,

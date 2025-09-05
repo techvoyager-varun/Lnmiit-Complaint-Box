@@ -74,7 +74,7 @@ const WardenDashboard = () => {
 
         {/* Complaints by Status */}
         <Tabs defaultValue="pending" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="pending" className="relative">
               Pending
               <Badge className="ml-2">{getComplaintsByStatus('pending').length}</Badge>
@@ -82,10 +82,6 @@ const WardenDashboard = () => {
             <TabsTrigger value="resolved" className="relative">
               Resolved
               <Badge className="ml-2">{getComplaintsByStatus('resolved').length}</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="not-resolved" className="relative">
-              Not Resolved
-              <Badge className="ml-2">{getComplaintsByStatus('not-resolved').length}</Badge>
             </TabsTrigger>
           </TabsList>
 
@@ -127,24 +123,6 @@ const WardenDashboard = () => {
             )}
           </TabsContent>
 
-          <TabsContent value="not-resolved" className="mt-6">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {getComplaintsByStatus('not-resolved').map((complaint) => (
-                <ComplaintCard
-                  key={complaint.id}
-                  complaint={complaint}
-                  onUpdate={handleComplaintUpdate}
-                  showActions={true}
-                  userRole="warden"
-                />
-              ))}
-            </div>
-            {getComplaintsByStatus('not-resolved').length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No unresolved complaints in {selectedBuilding}</p>
-              </div>
-            )}
-          </TabsContent>
         </Tabs>
       </div>
     </div>

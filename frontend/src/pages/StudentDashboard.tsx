@@ -106,18 +106,20 @@ const StudentDashboard = () => {
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {complaints.map((complaint) => (
-              <ComplaintCard
-                key={complaint.id}
-                complaint={complaint}
-                userRole="student"
-                showActions
-                onUpdate={(c) => {
-                  const next = c.status === 'resolved' ? 'resolved' : 'not-resolved';
-                  handleUpdate(complaint, next as any);
-                }}
-              />
-            ))}
+            {complaints
+              .filter((complaint) => complaint.status === 'pending' || complaint.status === 'resolved')
+              .map((complaint) => (
+                <ComplaintCard
+                  key={complaint.id}
+                  complaint={complaint}
+                  userRole="student"
+                  showActions
+                  onUpdate={(c) => {
+                    const next = c.status === 'resolved' ? 'resolved' : 'not-resolved';
+                    handleUpdate(complaint, next as any);
+                  }}
+                />
+              ))}
           </div>
         )}
       </div>

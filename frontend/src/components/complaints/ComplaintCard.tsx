@@ -87,11 +87,7 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
 
         {showActions && userRole && (
           <div className="flex space-x-2 pt-2">
-            {userRole === 'warden' && complaint.status === 'pending' && (
-              <Button size="sm" onClick={() => onUpdate?.({ ...complaint, status: 'assigned' })}>
-                Assign
-              </Button>
-            )}
+            {/* Removed Assign button for warden */}
 
             {userRole === 'warden' && complaint.status === 'assigned' && (
               <>

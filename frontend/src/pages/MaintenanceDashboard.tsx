@@ -3,6 +3,7 @@ import { Header } from '@/components/layout/Header';
 import { ComplaintCard } from '@/components/complaints/ComplaintCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { Complaint } from '@/types';
 import { apiRequest } from '@/lib/api';
@@ -10,6 +11,7 @@ import { apiRequest } from '@/lib/api';
 const MaintenanceDashboard = () => {
   const { user } = useAuth();
   const [complaints, setComplaints] = useState<Complaint[]>([]);
+  const [selectedBuilding, setSelectedBuilding] = useState('BH1');
 
   useEffect(() => {
     async function load() {
@@ -31,8 +33,20 @@ const MaintenanceDashboard = () => {
     load();
   }, [user]);
 
+  // Map profession to problem type
+  const professionToProblemType: Record<string, string> = {
+    Electrician: 'Electricity',
+    'AC Duct': 'AC',
+    LAN: 'LAN',
+    Carpenter: 'Furniture',
+  };
+
   const getComplaintsByStatus = (status: string) => {
-    return complaints.filter(c => c.status === status);
+    let filtered = complaints.filter(c => c.status === status);
+    if (user?.role === 'maintenance' && user.profession && professionToProblemType[user.profession]) {
+      filtered = filtered.filter(c => c.problemType === professionToProblemType[user.profession]);
+    }
+    return filtered;
   };
 
   const handleComplaintUpdate = (updatedComplaint: Complaint) => {
@@ -61,29 +75,46 @@ const MaintenanceDashboard = () => {
           </p>
         </div>
 
+        {/* Building Filter Tabs */}
+        <div className="flex space-x-2 mb-6">
+          {['BH1', 'BH2', 'BH3', 'BH4', 'GH'].map((building) => (
+            <Button
+              key={building}
+              variant={selectedBuilding === building ? 'default' : 'outline'}
+              onClick={() => setSelectedBuilding(building)}
+            >
+              {building}
+            </Button>
+          ))}
+        </div>
+
         <Tabs defaultValue="pending" className="w-full">
           <TabsList className="grid w-full grid-cols-1">
             <TabsTrigger value="pending" className="relative">
               Pending Complaints
-              <Badge className="ml-2">{getComplaintsByStatus('pending').length}</Badge>
+              <Badge className="ml-2">{
+                getComplaintsByStatus('pending').filter(c => c.building === selectedBuilding).length
+              }</Badge>
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="pending" className="mt-6">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {getComplaintsByStatus('pending').map((complaint) => (
-                <ComplaintCard
-                  key={complaint.id}
-                  complaint={complaint}
-                  onUpdate={handleComplaintUpdate}
-                  showActions={true}
-                  userRole="maintenance"
-                />
-              ))}
+              {getComplaintsByStatus('pending')
+                .filter((complaint) => complaint.building === selectedBuilding)
+                .map((complaint) => (
+                  <ComplaintCard
+                    key={complaint.id}
+                    complaint={complaint}
+                    onUpdate={handleComplaintUpdate}
+                    showActions={true}
+                    userRole="maintenance"
+                  />
+                ))}
             </div>
-            {getComplaintsByStatus('pending').length === 0 && (
+            {getComplaintsByStatus('pending').filter(c => c.building === selectedBuilding).length === 0 && (
               <div className="text-center py-12">
-                <p className="text-muted-foreground">No pending complaints</p>
+                <p className="text-muted-foreground">No pending complaints for {selectedBuilding}</p>
               </div>
             )}
           </TabsContent>

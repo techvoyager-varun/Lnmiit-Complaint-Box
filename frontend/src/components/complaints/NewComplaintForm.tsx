@@ -33,14 +33,29 @@ export const NewComplaintForm: React.FC<NewComplaintFormProps> = ({ onSubmit, on
         title: formData.problemType,
         description: formData.description,
         category: formData.problemType,
-        // send building/room to backend so wardens can filter accurately
         ...(user?.building ? { building: user.building } : {}),
         ...(user?.roomNumber ? { roomNumber: user.roomNumber } : {}),
       } as any);
       toast({ title: 'Complaint Submitted', description: 'Your complaint has been submitted successfully.' });
       onSubmit(created);
     } catch (err: any) {
-      toast({ title: 'Submission Failed', description: err.message || 'Try again', variant: 'destructive' });
+      // Custom error for complaint limit
+      let message = err?.message || 'Try again';
+      try {
+        // Try to parse backend error JSON if possible
+        const parsed = JSON.parse(message);
+        if (parsed && parsed.message) message = parsed.message;
+      } catch {}
+      if (message.includes('only submit 2 complaints')) {
+        toast({
+          title: 'Complaint Limit Reached',
+          description: 'You can only submit 2 complaints per 24 hours. Please try again after 24 hours from your first complaint.',
+          variant: 'destructive',
+          duration: 3000,
+        });
+      } else {
+        toast({ title: 'Submission Failed', description: message, variant: 'destructive' });
+      }
     } finally {
       setLoading(false);
     }
