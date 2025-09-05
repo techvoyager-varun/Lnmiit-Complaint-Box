@@ -3,7 +3,7 @@ import { User } from '@/types';
 
 interface AuthContextType {
   user: User | null;
-  login: (user: User) => void;
+  login: (data: { user: User; token: string }) => void;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -29,14 +29,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = (userData: User) => {
-    setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
+  const login = (data: { user: User; token: string }) => {
+    setUser(data.user);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    localStorage.setItem('token', data.token);
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
   const isAuthenticated = !!user;

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
-import { mockUsers } from '@/data/mockData';
+import { loginApi } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 
 export const LoginForm: React.FC = () => {
@@ -19,18 +19,11 @@ export const LoginForm: React.FC = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Mock authentication - find user by email
-    const user = mockUsers.find(u => u.email === email);
-    
-    if (user) {
-      login(user);
-      toast({
-        title: "Login Successful",
-        description: `Welcome back, ${user.name}!`,
-      });
-      
-      // Redirect based on role
-      switch (user.role) {
+    try {
+      const { token, user } = await loginApi(email, password);
+      login({ user, token });
+      toast({ title: 'Login Successful', description: `Welcome back, ${user.name}!` });
+      switch (user.role as any) {
         case 'student':
           navigate('/student');
           break;
@@ -43,12 +36,8 @@ export const LoginForm: React.FC = () => {
         default:
           navigate('/');
       }
-    } else {
-      toast({
-        title: "Login Failed",
-        description: "Invalid credentials",
-        variant: "destructive",
-      });
+    } catch (err: any) {
+      toast({ title: 'Login Failed', description: err.message || 'Invalid credentials', variant: 'destructive' });
     }
 
     setLoading(false);

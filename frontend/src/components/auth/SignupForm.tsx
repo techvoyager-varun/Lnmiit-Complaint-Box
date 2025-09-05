@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { UserRole, Building, MaintenanceProfession } from '@/types';
+import { signupApi } from '@/lib/api';
 
 export const SignupForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -28,48 +29,33 @@ export const SignupForm: React.FC = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Create new user object
-    const newUser = {
-      id: Date.now().toString(),
-      name: formData.name,
-      email: formData.email,
-      role: formData.role,
-      ...(formData.role === 'student' && {
-        rollNumber: formData.rollNumber,
-        roomNumber: formData.roomNumber,
-        building: formData.building,
-      }),
-      ...(formData.role === 'warden' && {
-        assignedBuilding: formData.assignedBuilding,
-      }),
-      ...(formData.role === 'maintenance' && {
-        profession: formData.profession,
-      }),
-    };
-
-    // Mock signup success
-    login(newUser);
-    toast({
-      title: "Account Created",
-      description: "Your account has been created successfully!",
-    });
-
-    // Redirect based on role
-    switch (formData.role) {
-      case 'student':
-        navigate('/student');
-        break;
-      case 'warden':
-        navigate('/warden');
-        break;
-      case 'maintenance':
-        navigate('/maintenance');
-        break;
-      default:
-        navigate('/');
+    try {
+      const { token, user } = await signupApi({
+        name: formData.name,
+        email: formData.email,
+        password: 'password',
+        role: formData.role,
+      });
+      login({ user, token });
+      toast({ title: 'Account Created', description: 'Your account has been created successfully!' });
+      switch (user.role as any) {
+        case 'student':
+          navigate('/student');
+          break;
+        case 'warden':
+          navigate('/warden');
+          break;
+        case 'maintenance':
+          navigate('/maintenance');
+          break;
+        default:
+          navigate('/');
+      }
+    } catch (err: any) {
+      toast({ title: 'Signup Failed', description: err.message || 'Try again', variant: 'destructive' });
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (

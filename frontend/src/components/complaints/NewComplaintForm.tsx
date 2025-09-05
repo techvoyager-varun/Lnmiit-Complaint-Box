@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { ProblemType } from '@/types';
+import { createComplaintApi } from '@/lib/api';
 
 interface NewComplaintFormProps {
   onSubmit: (complaint: any) => void;
@@ -27,28 +28,19 @@ export const NewComplaintForm: React.FC<NewComplaintFormProps> = ({ onSubmit, on
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    const newComplaint = {
-      id: Date.now().toString(),
-      studentId: user?.id || '',
-      studentName: user?.name || '',
-      building: user?.building || 'BH1',
-      roomNumber: user?.roomNumber || '',
-      problemType: formData.problemType,
-      description: formData.description,
-      status: 'pending' as const,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      images: [] // Mock - would handle file upload in real implementation
-    };
-
-    onSubmit(newComplaint);
-    toast({
-      title: "Complaint Submitted",
-      description: "Your complaint has been submitted successfully.",
-    });
-
-    setLoading(false);
+    try {
+      await createComplaintApi({
+        title: formData.problemType,
+        description: formData.description,
+        category: formData.problemType,
+      });
+      toast({ title: 'Complaint Submitted', description: 'Your complaint has been submitted successfully.' });
+      onSubmit({});
+    } catch (err: any) {
+      toast({ title: 'Submission Failed', description: err.message || 'Try again', variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

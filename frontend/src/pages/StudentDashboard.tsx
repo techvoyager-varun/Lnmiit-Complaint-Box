@@ -4,7 +4,7 @@ import { Header } from '@/components/layout/Header';
 import { ComplaintCard } from '@/components/complaints/ComplaintCard';
 import { NewComplaintForm } from '@/components/complaints/NewComplaintForm';
 import { useAuth } from '@/contexts/AuthContext';
-import { mockComplaints } from '@/data/mockData';
+import { listMyComplaintsApi } from '@/lib/api';
 import { Complaint } from '@/types';
 import { Plus } from 'lucide-react';
 
@@ -14,11 +14,29 @@ const StudentDashboard = () => {
   const [showNewComplaintForm, setShowNewComplaintForm] = useState(false);
 
   useEffect(() => {
-    // Filter complaints for current student
-    if (user) {
-      const studentComplaints = mockComplaints.filter(c => c.studentId === user.id);
-      setComplaints(studentComplaints);
+    async function load() {
+      if (!user) return;
+      try {
+        const data = await listMyComplaintsApi();
+        // Map backend to frontend type loosely for now
+        const mapped = data.map((d: any) => ({
+          id: d._id,
+          studentId: d.student,
+          studentName: user.name,
+          building: user.building || 'BH1',
+          roomNumber: user.roomNumber || '',
+          problemType: d.category,
+          description: d.description,
+          status: d.status === 'open' ? 'pending' : d.status === 'in_progress' ? 'assigned' : d.status === 'resolved' ? 'resolved' : 'not-resolved',
+          createdAt: d.createdAt,
+          updatedAt: d.updatedAt,
+        }));
+        setComplaints(mapped);
+      } catch (e) {
+        // ignore for now
+      }
     }
+    load();
   }, [user]);
 
   const handleNewComplaint = (complaint: Complaint) => {
