@@ -28,32 +28,6 @@ A modern, full-stack web application for efficient complaint management in hoste
 - **Filtered Views**: Complaints organized by status (Pending, Resolved)
 - **Building Filters**: Switch between different hostel buildings
 
-## 🛠️ Technology Stack
-
-### Frontend
-- **React 18** with TypeScript
-- **Vite** for fast development and building
-- **TailwindCSS** for utility-first styling
-- **Radix UI** for accessible component primitives
-- **Lucide React** for consistent iconography
-- **React Router** for client-side routing
-- **React Hook Form** with Zod validation
-- **TanStack Query** for server state management
-
-### Backend
-- **Node.js** with Express.js
-- **MongoDB** with Mongoose ODM
-- **JWT** for authentication
-- **Bcrypt** for password hashing
-- **CORS** for cross-origin resource sharing
-- **Zod** for request validation
-
-### Development Tools
-- **TypeScript** for static type checking
-- **ESLint** for code linting
-- **PostCSS** for CSS processing
-- **Nodemon** for development server
-
 ## 🚀 Quick Start
 
 ### Prerequisites
