@@ -40,7 +40,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen }) 
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
     setMenuOpen(false);
   };
 
