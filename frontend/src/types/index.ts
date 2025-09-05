@@ -4,7 +4,7 @@ export type Building = 'BH1' | 'BH2' | 'BH3' | 'BH4' | 'GH';
 
 export type ComplaintStatus = 'pending' | 'assigned' | 'resolved' | 'not-resolved';
 
-export type ProblemType = 'Electricity' | 'AC' | 'LAN' | 'Furniture' | 'Plumbing';
+export type ProblemType = 'Electrician' | 'AC Duct' | 'LAN' | 'Carpenter';
 
 export type MaintenanceProfession = 'Electrician' | 'AC Duct' | 'LAN' | 'Carpenter';
 

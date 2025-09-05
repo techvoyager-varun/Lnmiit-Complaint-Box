@@ -46,7 +46,7 @@ const StudentDashboard = () => {
       studentName: user?.name || '',
       building: user?.building || 'BH1',
       roomNumber: user?.roomNumber || '',
-      problemType: complaint.category,
+  problemType: complaint.category,
       description: complaint.description,
       status: complaint.status === 'open' ? 'pending' : complaint.status === 'in_progress' ? 'assigned' : complaint.status === 'resolved' ? 'resolved' : 'not-resolved',
       createdAt: complaint.createdAt,

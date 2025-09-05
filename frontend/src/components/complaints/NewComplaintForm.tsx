@@ -75,11 +75,10 @@ export const NewComplaintForm: React.FC<NewComplaintFormProps> = ({ onSubmit, on
                 <SelectValue placeholder="Select problem type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Electricity">Electricity</SelectItem>
-                <SelectItem value="AC">AC</SelectItem>
+                <SelectItem value="Electrician">Electrician</SelectItem>
+                <SelectItem value="AC Duct">AC Duct</SelectItem>
                 <SelectItem value="LAN">LAN</SelectItem>
-                <SelectItem value="Furniture">Furniture</SelectItem>
-                <SelectItem value="Plumbing">Plumbing</SelectItem>
+                <SelectItem value="Carpenter">Carpenter</SelectItem>
               </SelectContent>
             </Select>
           </div>

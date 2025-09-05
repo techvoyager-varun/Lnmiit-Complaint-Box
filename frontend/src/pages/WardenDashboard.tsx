@@ -25,7 +25,7 @@ const WardenDashboard = () => {
         studentName: d.studentName || 'Student',
         building: d.building,
         roomNumber: d.roomNumber || '',
-        problemType: d.category,
+  problemType: d.category,
         description: d.description,
         status: d.status === 'open' ? 'pending' : d.status === 'in_progress' ? 'assigned' : d.status === 'resolved' ? 'resolved' : 'not-resolved',
         createdAt: d.createdAt,

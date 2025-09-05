@@ -35,10 +35,10 @@ const MaintenanceDashboard = () => {
 
   // Map profession to problem type
   const professionToProblemType: Record<string, string> = {
-    Electrician: 'Electricity',
-    'AC Duct': 'AC',
+    Electrician: 'Electrician',
+    'AC Duct': 'AC Duct',
     LAN: 'LAN',
-    Carpenter: 'Furniture',
+    Carpenter: 'Carpenter',
   };
 
   const getComplaintsByStatus = (status: string) => {
