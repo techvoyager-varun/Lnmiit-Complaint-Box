@@ -71,7 +71,7 @@ Create a `.env` file in the backend directory:
 
 ```env
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/lnmiit-complaints
+MONGODB_URI=mongodb+srv://username:password@cluster0.lr8uxyy.mongodb.net/lnmiit_complaint_box?retryWrites=true&w=majority
 JWT_SECRET=your-super-secret-jwt-key
 FRONTEND_URL=xxxx
 ```
