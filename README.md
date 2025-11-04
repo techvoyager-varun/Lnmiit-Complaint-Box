@@ -65,10 +65,6 @@ A modern, full-stack web application for efficient complaint management in hoste
    npm run dev
    ```
 
-4. **Access the Application**
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:5000
-
 ### Environment Configuration
 
 Create a `.env` file in the backend directory:
